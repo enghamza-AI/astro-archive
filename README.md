@@ -8,7 +8,7 @@ Built with pure HTML + CSS — no JavaScript, no frameworks.
 - Concert setlists from 2018–2024
 - Vintage concert poster aesthetic
 - Dark theme with CSS animations
-- Hosted on GitHub Pages
+- Hosted on vercel
 
 ## Built to learn
 Semantic HTML · CSS variables · Flexbox · Box model · Google Fonts · GitHub Pages
