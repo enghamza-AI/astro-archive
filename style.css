@@ -1,0 +1,1012 @@
+/*
+  ═══════════════════════════════════════════════════════════════
+  ASTRO ARCHIVE — style.css
+  Travis Scott Setlist Archive
+  ═══════════════════════════════════════════════════════════════
+
+  FILE STRUCTURE (use Ctrl+F to jump):
+  1.  CSS RESET
+  2.  CSS CUSTOM PROPERTIES (variables)
+  3.  BASE / TYPOGRAPHY
+  4.  LAYOUT UTILITIES
+  5.  HEADER
+  6.  HERO
+  7.  SETLIST SECTION + CARDS
+  8.  ASIDE / SIDEBAR
+  9.  FOOTER
+  10. ANIMATIONS & GLITCH EFFECT
+  11. MEDIA QUERY (mobile)
+*/
+
+
+/* ═══════════════════════════════════════════════════════════════
+   1. CSS RESET
+   ═══════════════════════════════════════════════════════════════
+
+   WHAT IS A RESET?
+   Every browser (Chrome, Firefox, Safari) ships with its own
+   "User Agent Stylesheet" — default styles applied to HTML before
+   you write a single line of CSS.
+
+   Examples of defaults you didn't ask for:
+   - <h1> has margin-top and margin-bottom baked in
+   - <ul> has padding-left: 40px and bullet points
+   - <a> is blue and underlined
+   - <body> has margin: 8px all around
+   - <button> has borders, background, and weird padding
+
+   A reset REMOVES these defaults so you start from zero.
+   Every pixel of spacing is then YOUR intention, not the browser's.
+
+   WHY box-sizing: border-box?
+   By default, CSS uses box-sizing: content-box:
+     width: 300px + padding: 20px = ACTUAL width of 340px
+   
+   With border-box:
+     width: 300px + padding: 20px = STILL 300px (padding is inside)
+   
+   border-box is almost always what you want. It makes layout
+   math predictable. We apply it to everything with *.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;  /* Include padding + border in width/height calculations */
+  margin: 0;               /* Wipe all default margins */
+  padding: 0;              /* Wipe all default padding */
+}
+
+html {
+  scroll-behavior: smooth; /* Smooth scroll when clicking anchor links like #setlists */
+}
+
+img {
+  display: block;          /* Images are inline by default, causing weird gaps below them */
+  max-width: 100%;         /* Never overflow their container */
+}
+
+ul, ol {
+  list-style: none;        /* Remove bullets and numbers (we'll add our own styling) */
+}
+
+a {
+  text-decoration: none;   /* Remove default underlines */
+  color: inherit;          /* Inherit the parent's text color instead of going blue */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   2. CSS CUSTOM PROPERTIES (Variables)
+   ═══════════════════════════════════════════════════════════════
+
+   CSS VARIABLES — also called "custom properties"
+   Defined on :root (the <html> element) so they're global.
+   
+   SYNTAX:
+   --variable-name: value;     ← define
+   color: var(--variable-name); ← use
+   
+   WHY USE THEM?
+   Without variables, your orange color #FF6B35 might appear 40 times
+   in your CSS. Want to change it? Find and replace 40 times.
+   With variables, change it ONCE in :root, done.
+   
+   This is also how theming works — swap the variable values
+   and your whole site changes theme.
+   
+   We use a naming convention: --category-property
+   e.g. --color-bg-primary, --font-display, --space-lg
+*/
+
+:root {
+
+  /* ─── Colour Palette ─── */
+  /* The vintage dark concert poster palette */
+
+  --color-bg-primary:     #0a0a0a;   /* Near-black background — the stage */
+  --color-bg-secondary:   #111111;   /* Slightly lighter — card backgrounds */
+  --color-bg-card:        #141414;   /* Cards — just enough lift from bg */
+  --color-bg-accent:      #1a1a1a;   /* Hover states, subtle elevation */
+
+  --color-brand:          #FF6B35;   /* Travis orange — the energy, flames */
+  --color-brand-dim:      #cc4a1a;   /* Dimmer orange for hover states */
+  --color-brand-glow:     rgba(255, 107, 53, 0.15); /* Transparent orange for glows */
+
+  --color-gold:           #D4A843;   /* Old concert poster gold — featured songs */
+  --color-gold-dim:       rgba(212, 168, 67, 0.2);
+
+  --color-text-primary:   #F0EDE8;   /* Off-white — easier on eyes than pure white */
+  --color-text-secondary: #9B9590;   /* Muted — secondary info, metadata */
+  --color-text-muted:     #5C5955;   /* Very muted — decorative text */
+
+  --color-border:         #2a2a2a;   /* Subtle card borders */
+  --color-border-bright:  #3a3a3a;   /* Hover borders */
+
+  /* ─── Typography ─── */
+  --font-display:  'Bebas Neue', sans-serif;     /* Concert poster headings */
+  --font-body:     'Space Grotesk', sans-serif;  /* Clean readable text */
+  --font-mono:     'Space Mono', monospace;       /* Dates, numbers, labels */
+
+  /* ─── Spacing Scale ─── */
+  /*
+    A consistent spacing scale makes your layout feel intentional.
+    All spacing is a multiple of a base unit (8px here).
+    4, 8, 16, 24, 32, 48, 64, 96...
+    
+    WHY? When everything shares a rhythm, spacing looks "right"
+    even if the viewer can't explain why.
+  */
+  --space-xs:   4px;
+  --space-sm:   8px;
+  --space-md:   16px;
+  --space-lg:   24px;
+  --space-xl:   48px;
+  --space-2xl:  96px;
+
+  /* ─── Border Radius ─── */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  /* ─── Transitions ─── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 300ms ease;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   3. BASE / TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════
+*/
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  /*
+    line-height: 1.6 = each line is 1.6× the font size.
+    No unit = relative to font-size. Better than 1.6px (fixed).
+    Default browser line-height (~1.2) is too tight for body text.
+    1.5–1.7 is the readable sweet spot.
+  */
+  overflow-x: hidden; /* Prevent horizontal scroll from animations */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   4. LAYOUT UTILITIES
+   ═══════════════════════════════════════════════════════════════
+*/
+
+.main-layout {
+  /*
+    FLEXBOX — the main layout tool for 1-dimensional layouts.
+    
+    display: flex turns an element into a "flex container".
+    Its direct children become "flex items".
+    
+    THE TWO AXES:
+    - Main axis:  determined by flex-direction (default: row = horizontal)
+    - Cross axis: perpendicular to main axis (default: vertical)
+    
+    justify-content → aligns items along the MAIN axis
+    align-items     → aligns items along the CROSS axis
+    
+    gap: adds space BETWEEN flex items (no margin hacks needed)
+  */
+  display: flex;
+  flex-direction: row;      /* Items go left to right (default) */
+  align-items: flex-start;  /* Items stick to the top, don't stretch */
+  gap: var(--space-xl);     /* Space between the section and aside */
+  max-width: 1200px;
+  margin: 0 auto;           /* Center the layout horizontally */
+  padding: var(--space-xl) var(--space-lg);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   5. HEADER
+   ═══════════════════════════════════════════════════════════════
+*/
+
+.site-header {
+  display: flex;
+  justify-content: space-between; /* Push brand left, nav right */
+  align-items: center;
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;   /* Sticks to top as you scroll */
+  top: 0;
+  z-index: 100;       /* Sits above other content */
+  background-color: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(8px); /* Frosted glass effect on bg behind header */
+}
+
+.site-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  /*
+    clamp(min, preferred, max)
+    Font scales with viewport: min 1.8rem, preferred 4vw, max 2.8rem.
+    On mobile it's 1.8rem. On big screens it's 2.8rem.
+    This is fluid typography — no media queries needed for font sizes.
+  */
+  color: var(--color-brand);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.site-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: var(--space-xs);
+}
+
+.site-nav ul {
+  display: flex;           /* Nav links in a row */
+  gap: var(--space-xl);
+}
+
+.site-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+  position: relative;      /* For the underline pseudo-element */
+}
+
+.site-nav a::after {
+  /*
+    ::after is a CSS PSEUDO-ELEMENT.
+    It creates a virtual element AFTER the content of .site-nav a.
+    No HTML needed — pure CSS decoration.
+    
+    Here we use it to create an animated underline effect.
+    The element starts at width: 0, grows to width: 100% on hover.
+    
+    ::before creates a virtual element BEFORE the content.
+    ::after creates a virtual element AFTER the content.
+    
+    Rules: must have content: "" (even empty string) to render.
+    Must have display set (or position: absolute).
+  */
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;               /* Start invisible */
+  height: 1px;
+  background: var(--color-brand);
+  transition: width var(--transition-normal); /* Animate width */
+}
+
+.site-nav a:hover {
+  color: var(--color-text-primary);
+}
+
+.site-nav a:hover::after {
+  width: 100%;             /* Expand to full width on hover */
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   6. HERO
+   ═══════════════════════════════════════════════════════════════
+*/
+
+.hero {
+  position: relative;       /* Needed so children with position:absolute are relative to this */
+  overflow: hidden;
+  padding: var(--space-2xl) var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  min-height: 60vh;         /* At least 60% of viewport height */
+  display: flex;
+  align-items: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;               /* Sits above the bg decorative text */
+  max-width: 700px;
+}
+
+.hero-bg-text {
+  /*
+    This is the massive background "TRAVIS SCOTT" text.
+    Pure decoration — not in the reading flow.
+    
+    position: absolute removes it from normal document flow.
+    It sits in a layer behind the content (z-index: 1 vs content's z-index: 2).
+  */
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%); /* Vertically center it */
+  font-family: var(--font-display);
+  font-size: clamp(80px, 15vw, 180px);
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-border-bright);
+  /* -webkit-text-stroke creates outlined text — just the stroke, no fill.
+     Not in the W3C spec yet but works in all modern browsers. */
+  white-space: nowrap;
+  z-index: 1;
+  pointer-events: none;     /* Clicks pass through to content below */
+  animation: bgTextDrift 20s ease-in-out infinite;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-brand);
+  margin-bottom: var(--space-md);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-xl);
+  max-width: 500px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;  /* Stack number above label */
+}
+
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--color-brand);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xs);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   7. SETLIST SECTION + CARDS
+   ═══════════════════════════════════════════════════════════════
+
+   THE BOX MODEL — explained with .setlist-card
+   
+   Every HTML element is a box. That box has 4 layers (outside → in):
+   
+   ┌─────────────────────────────────────┐
+   │              MARGIN                 │ ← Space OUTSIDE the element
+   │  ┌───────────────────────────────┐  │   (pushes OTHER elements away)
+   │  │           BORDER              │  │ ← The visible edge
+   │  │  ┌─────────────────────────┐  │  │
+   │  │  │        PADDING          │  │  │ ← Space INSIDE the border
+   │  │  │  ┌───────────────────┐  │  │  │   (between border and content)
+   │  │  │  │     CONTENT       │  │  │  │ ← Your actual text/images
+   │  │  │  └───────────────────┘  │  │  │
+   │  │  └─────────────────────────┘  │  │
+   │  └───────────────────────────────┘  │
+   └─────────────────────────────────────┘
+   
+   MARGIN vs PADDING — the most common confusion in CSS:
+   
+   MARGIN:  Outside the box. No background color. Collapses with adjacent margins.
+            Use for: space between cards, sections, elements.
+   
+   PADDING: Inside the box. Background color extends through it. Doesn't collapse.
+            Use for: space between the border and the text inside a card.
+   
+   Example:
+     padding: 24px;   → 24px of breathable space inside the card before text starts
+     margin-bottom: 24px; → 24px gap between this card and the next one
+*/
+
+.setlist-section {
+  flex: 1;              /* Take up all available space beside the sidebar */
+  min-width: 0;         /* Prevent flex children from overflowing (flex bug fix) */
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.3em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.setlist-grid {
+  display: flex;
+  flex-direction: column; /* Stack cards vertically */
+  gap: var(--space-lg);   /* Space between cards */
+}
+
+/* ─── The Setlist Card ─── */
+
+.setlist-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);     /* PADDING: space inside the card */
+  /*
+    No margin here. The gap: property on .setlist-grid
+    handles the space between cards. Using gap is cleaner
+    than adding margin to each card and then removing it from the last one.
+  */
+  transition: border-color var(--transition-normal),
+              transform var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.setlist-card::before {
+  /*
+    A vertical orange line on the left edge of each card.
+    Created with ::before pseudo-element — no extra HTML.
+    
+    position: absolute + left: 0 + top: 0 + height: 100%
+    = a thin strip along the entire left edge.
+  */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--color-border);
+  transition: background var(--transition-normal);
+}
+
+.setlist-card:hover {
+  border-color: var(--color-border-bright);
+  transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+.setlist-card:hover::before {
+  background: var(--color-brand); /* Orange line appears on hover */
+}
+
+/* ─── Card Header ─── */
+
+.card-header {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.tour-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--color-brand-glow);
+  color: var(--color-brand);
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-sm);
+}
+
+/* Variant badge colours for different tours */
+.tour-badge--astro  { background: rgba(64, 156, 255, 0.1); color: #409CFF; border-color: rgba(64, 156, 255, 0.3); }
+.tour-badge--virtual{ background: rgba(190, 100, 255, 0.1); color: #BE64FF; border-color: rgba(190, 100, 255, 0.3); }
+.tour-badge--wish   { background: rgba(212, 168, 67, 0.1);  color: var(--color-gold); border-color: rgba(212, 168, 67, 0.3); }
+
+.show-date {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-text-primary);
+  letter-spacing: 0.03em;
+  line-height: 1;
+  margin-bottom: var(--space-xs);
+}
+
+.card-venue {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+/* ─── Song List ─── */
+
+.setlist {
+  margin-bottom: var(--space-md);
+}
+
+.song {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast),
+              padding-left var(--transition-fast);
+  cursor: default;
+}
+
+.song:hover {
+  color: var(--color-text-primary);
+  padding-left: var(--space-sm); /* Nudge right on hover */
+}
+
+.song-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  min-width: 20px;  /* Fixed width so all song names align */
+}
+
+.song.featured {
+  /*
+    Featured songs (★) get a gold highlight treatment.
+    The class is added directly in HTML: class="song featured"
+  */
+  color: var(--color-gold);
+}
+
+.song.featured .song-num {
+  color: var(--color-gold);
+}
+
+.song.encore {
+  color: var(--color-brand);
+  font-style: italic;
+}
+
+/* ─── Card Footer ─── */
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.song-count {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+.card-tag {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   8. ASIDE / SIDEBAR
+   ═══════════════════════════════════════════════════════════════
+*/
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  /*
+    flex-shrink: 0 → this item refuses to shrink even when space is tight.
+    Without it, flexbox might squish the sidebar to fit content.
+    We want it to stay exactly 280px wide.
+  */
+  position: sticky;     /* Sticks while you scroll the setlist */
+  top: 80px;            /* 80px from top (accounts for sticky header height) */
+  align-self: flex-start;
+}
+
+.sidebar-photo-area {
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;     /* Clip the image to the border-radius */
+  border: 1px solid var(--color-border);
+  aspect-ratio: 3 / 4;  /* Portrait ratio for a live photo */
+  background: var(--color-bg-card); /* Shows while image loads */
+}
+
+.sidebar-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* Fill the area, crop if needed (like background-size: cover) */
+  filter: grayscale(30%) contrast(110%); /* Vintage feel */
+  transition: filter var(--transition-normal);
+}
+
+.sidebar-photo:hover {
+  filter: grayscale(0%) contrast(100%);
+}
+
+.sidebar-block {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-md);
+}
+
+.sidebar-heading {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-brand);
+  margin-bottom: var(--space-md);
+}
+
+.sidebar-bio {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* ─── Era Timeline ─── */
+
+.era-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.era-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  padding: var(--space-xs) 0;
+}
+
+.era-year {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  min-width: 36px;
+}
+
+.era-item.active {
+  color: var(--color-gold);
+}
+
+.era-item.active .era-year {
+  color: var(--color-gold);
+}
+
+/* ─── Top Songs ─── */
+
+.top-songs {
+  list-style: decimal inside;
+  /* 'decimal inside' = numbers rendered inside the element flow.
+     We removed all list-style in the reset, so we're adding it back
+     explicitly here where it's semantically meaningful (a ranking). */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.top-songs li {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.top-songs li em {
+  font-style: normal;  /* Override <em>'s italic default */
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+/* ─── Sidebar Links ─── */
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.sidebar-links a {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.sidebar-links a:hover {
+  color: var(--color-brand);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   9. FOOTER
+   ═══════════════════════════════════════════════════════════════
+*/
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;  /* Wrap to new line on small screens */
+  gap: var(--space-lg);
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-brand);
+  letter-spacing: 0.05em;
+}
+
+.footer-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  margin-top: var(--space-xs);
+}
+
+.footer-nav ul {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.footer-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.footer-nav a:hover {
+  color: var(--color-text-secondary);
+}
+
+.footer-credit {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   10. ANIMATIONS & GLITCH EFFECT
+   ═══════════════════════════════════════════════════════════════
+
+   CSS ANIMATIONS — two parts:
+   
+   1. @keyframes defines WHAT the animation does
+      (a sequence of states from 0% to 100%)
+   
+   2. animation property applies it to an element:
+      animation: name duration timing-function iteration-count;
+   
+   TRANSITIONS vs ANIMATIONS:
+   Transition: A → B when triggered (hover, focus, class change)
+               Simple, needs a trigger event
+   Animation:  Runs automatically, can loop, can have multiple steps
+               More complex, more control
+*/
+
+/* ─── Background text drift ─── */
+@keyframes bgTextDrift {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50%       { transform: translateY(-50%) translateX(-20px); }
+  /* Subtly drifts left-right over 20 seconds. Very slow = atmosphere. */
+}
+
+/* ─── Card entrance animation ─── */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.setlist-card {
+  animation: cardEntrance 0.6s ease forwards;
+}
+
+/* Stagger each card's entrance with a delay */
+.setlist-card:nth-child(1) { animation-delay: 0.1s; }
+.setlist-card:nth-child(2) { animation-delay: 0.2s; }
+.setlist-card:nth-child(3) { animation-delay: 0.3s; }
+.setlist-card:nth-child(4) { animation-delay: 0.4s; }
+/*
+  nth-child(n) selects the nth direct child.
+  By increasing animation-delay, cards stagger into view
+  one after another instead of all at once.
+  This is called a "staggered entrance" and makes the UI
+  feel alive and intentional.
+*/
+
+/* ─── Glitch Effect on the site title ─── */
+/*
+  The glitch effect uses ::before and ::after to create
+  two clones of the text, offset and recoloured,
+  then rapidly shifts them using @keyframes.
+  
+  data-text="ASTRO ARCHIVE" in the HTML is used here:
+  content: attr(data-text) reads that attribute value.
+*/
+
+.glitch {
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);  /* Reads the data-text attribute from HTML */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  color: #00FFFF;  /* Cyan channel */
+  animation: glitchTop 3s infinite linear;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  /* clip-path cuts the element to show only the top 35% */
+}
+
+.glitch::after {
+  color: #FF006E;  /* Magenta channel */
+  animation: glitchBottom 3s infinite linear;
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  /* clip-path cuts to show only the bottom 35% */
+}
+
+@keyframes glitchTop {
+  0%,  90%, 100%  { transform: translate(0); opacity: 0; }
+  92%             { transform: translate(-3px, -2px); opacity: 0.8; }
+  94%             { transform: translate(3px, 0); opacity: 0.8; }
+  96%             { transform: translate(-2px, 2px); opacity: 0.8; }
+  98%             { transform: translate(0); opacity: 0; }
+}
+
+@keyframes glitchBottom {
+  0%,  90%, 100%  { transform: translate(0); opacity: 0; }
+  91%             { transform: translate(3px, 2px); opacity: 0.8; }
+  93%             { transform: translate(-3px, 0); opacity: 0.8; }
+  95%             { transform: translate(2px, -2px); opacity: 0.8; }
+  97%             { transform: translate(0); opacity: 0; }
+}
+/*
+  Note: 0% to 90% = no glitch (opacity: 0, no transform)
+  The glitch only fires in the 90%–100% window of a 3 second loop.
+  So it glitches for ~0.3 seconds every 3 seconds — feels intentional,
+  not distracting. This subtlety is the difference between good and annoying animation.
+*/
+
+/* ─── Accessibility: Respect user's motion preference ─── */
+@media (prefers-reduced-motion: reduce) {
+  /*
+    Some users have vestibular disorders where motion causes
+    physical discomfort. They set "Reduce Motion" in their OS.
+    This media query detects that setting and turns off animations.
+    
+    This is one line of CSS that makes your site accessible to
+    people with sensory disabilities. Always include it.
+  */
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   11. MEDIA QUERY — Mobile
+   ═══════════════════════════════════════════════════════════════
+
+   MEDIA QUERIES let you apply CSS rules only when certain
+   conditions are met — most commonly screen width.
+   
+   max-width: 768px = apply these rules when screen is 768px wide or less.
+   
+   We write MOBILE-LAST here (desktop first, then override for mobile).
+   The other approach is mobile-first (write for mobile, override for desktop).
+   Both are valid — mobile-first is more common in production.
+*/
+
+@media (max-width: 768px) {
+
+  .main-layout {
+    flex-direction: column; /* Stack sidebar below setlist on mobile */
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .sidebar {
+    width: 100%;          /* Full width on mobile */
+    position: static;     /* Unstick the sidebar */
+  }
+
+  .site-header {
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .hero {
+    padding: var(--space-xl) var(--space-md);
+    min-height: 40vh;
+  }
+
+  .hero-stats {
+    gap: var(--space-lg);
+  }
+
+  .hero-bg-text {
+    display: none; /* Hide decorative text on small screens — too noisy */
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-nav ul {
+    justify-content: center;
+  }
+}
